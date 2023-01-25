@@ -29,7 +29,7 @@ def create_commendations(schoolkid, subject_to_commendate):
 
     kid = get_schoolkid(schoolkid)
     subject_title = get_subject(subject_to_commendate)
-    lesson = Lesson.objects.filter(year_of_study=6, group_letter="А", subject__title=subject_title).order_by("date").first()
+    lesson = Lesson.objects.filter(year_of_study=6, group_letter="А", subject__title=subject_title).order_by("-date").first()
     Commendation.objects.create(text=choice(COMMENDATION_TEXT),
                                 created=lesson.date, schoolkid=kid,
                                 subject=lesson.subject,
@@ -41,17 +41,17 @@ def create_commendations(schoolkid, subject_to_commendate):
 def get_schoolkid(schoolkid):
     try:
         return Schoolkid.objects.get(full_name__contains=schoolkid)
-    except DoesNotExist:
+    except Schoolkid.DoesNotExist:
         print(f'Учеников по запросу "{schoolkid}" не найдено')
-    except MultipleObjectsReturned:
+    except Schoolkid.MultipleObjectsReturned:
         print(f' Найдено несколько учеников по запросу "{schoolkid}"')
 
 
 def get_subject(subject_title):
     try:
         return Subject.objects.get(title=subject_title)
-    except DoesNotExist:
+    except Subject.DoesNotExist:
         print(f'Предмета по запросу "{subject_title}" не найдено')
-    except MultipleObjectsReturned:
+    except Subject.MultipleObjectsReturned:
         print(f' Найдено несколько предметов по запросу "{subject_title}"')
 
