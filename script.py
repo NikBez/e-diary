@@ -1,7 +1,8 @@
-from datacenter.models import Mark, Chastisement, Lesson, Schoolkid, Commendation, Subject
+from datacenter.models import Mark, Chastisement, Lesson, Schoolkid, \
+    Commendation, Subject
 from random import choice
 
-COMMENDATION_TEXT = [
+COMMENDATIONS = [
     "Гораздо лучше, чем я ожидал!",
     "Ты меня приятно удивил!",
     "Великолепно!",
@@ -13,11 +14,13 @@ COMMENDATION_TEXT = [
     "С каждым разом у тебя получается всё лучше!",
 ]
 
+
 def fix_marks(schoolkid):
 
     kid = get_schoolkid(schoolkid)
-    Mark.objects.filter(schoolkid = kid, points__lte=3).update(points=5)
+    Mark.objects.filter(schoolkid=kid, points__lte=3).update(points=5)
     print("All done")
+
 
 def remove_chastisements(schoolkid):
 
@@ -25,13 +28,18 @@ def remove_chastisements(schoolkid):
     Chastisement.objects.filter(schoolkid=kid).delete()
     print("All done")
 
+
 def create_commendations(schoolkid, subject_to_commendate):
 
     kid = get_schoolkid(schoolkid)
     subject_title = get_subject(subject_to_commendate)
-    lesson = Lesson.objects.filter(year_of_study=6, group_letter="А", subject__title=subject_title).order_by("-date").first()
-    Commendation.objects.create(text=choice(COMMENDATION_TEXT),
-                                created=lesson.date, schoolkid=kid,
+    lesson = Lesson.objects.filter(year_of_study=kid.year_of_study,
+                                   group_letter=kid.group_letter,
+                                   subject__title=subject_title).order_by("-date").first()
+
+    Commendation.objects.create(text=choice(COMMENDATIONS),
+                                created=lesson.date,
+                                schoolkid=kid,
                                 subject=lesson.subject,
                                 teacher=lesson.teacher
                                 )
@@ -54,4 +62,3 @@ def get_subject(subject_title):
         print(f'Предмета по запросу "{subject_title}" не найдено')
     except Subject.MultipleObjectsReturned:
         print(f' Найдено несколько предметов по запросу "{subject_title}"')
-
